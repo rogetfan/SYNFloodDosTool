@@ -84,7 +84,7 @@ void dosattack(const struct AHTTP_INPUT *ainput)
 
     // Zero out the buffer
     //memset(datagram, 0, 4096);
-    memset(datagram, 0, 40960);
+    memset(datagram, 0, 4096);
 
     // Fill in the IP Header
     iph->ihl = 5;
