@@ -164,10 +164,12 @@ void dosattack(const struct AHTTP_INPUT *ainput)
                 debug(debug_mode, 2, "Attack send error");
             }
             // Data send successfully
+            /*
             else
             {
                 debug(debug_mode, 2, "Attack packet end successful");
             }
+            */
         }
     }
     else
