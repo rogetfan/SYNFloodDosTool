@@ -24,11 +24,11 @@ void work(struct INPUT_ARG *pinput)
 {
 
     pid_t pid;
-    pthread_t tid;
+    //pthread_t tid;
     int process_i;
     int debug_mode = pinput->DebugMode;
-    int thread_i;
-    int ret;
+    //int thread_i;
+    //int ret;
 
     // Create the process and thread here
     for (process_i = 0; process_i < MAX_PROCESS_NUM; process_i++)
@@ -38,6 +38,7 @@ void work(struct INPUT_ARG *pinput)
         if (pid == 0)
         {
             // Child process
+            /*
             for (thread_i = 0; thread_i < MAX_THREAD_NUM; thread_i++)
             {
                 // [1, MAX_THREAD_NUM] thread
@@ -49,14 +50,16 @@ void work(struct INPUT_ARG *pinput)
                 }
                 pthread_join(tid, NULL);
             }
+            */
 
-            //exploit(pinput);
+            exploit(pinput);
         }
         else if (pid < 0)
         {
             // Error now
             debug(debug_mode, 1, "Create process error\n");
         }
+        /*
         else
         {
 
@@ -84,6 +87,7 @@ void work(struct INPUT_ARG *pinput)
                 }
             }
         }
+        */
     }
 }
 
