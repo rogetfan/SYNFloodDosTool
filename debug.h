@@ -7,6 +7,6 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-void debug(int flag, char *pstring);
+void debug(const int debugflag, const int debuglevel, const char *fmtstring, ...);
 
 #endif

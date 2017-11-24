@@ -1,10 +1,10 @@
 .SUFFIXES:.c .o
 
 CC   = gcc
-SRCS = thread.c exploit.c rand.c http.c debug.c
+SRCS = thread.c exploit.c rand.c http.c debug.c ahttp.c
 
 OBJS = $(SRCS:.c=.o)
-EXEC = length
+EXEC = tool
 
 start: $(OBJS)
 		$(CC) -o $(EXEC) $(OBJS) -g -Wall -lpthread

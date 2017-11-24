@@ -25,7 +25,7 @@ struct HTTP_POST_ARG
     char *PostData;
     char *ReturnStr;
     int DebugMode;
-    int NotRecv;
+    int Attack;
 };
 
 #define HTTP_POST "POST /%s HTTP/1.1\r\n"                              \
@@ -41,6 +41,5 @@ struct HTTP_POST_ARG
 
 //char *http_get(const char *url, int debug_mode, int not_recv);
 void http_post(const struct HTTP_POST_ARG *input);
-int http_judge(const char *inbuf, int debug_mode);
 
 #endif

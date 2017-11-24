@@ -12,22 +12,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <arpa/inet.h>
+//#include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include <time.h>
+//#include <time.h>
 
 #include <sys/socket.h>
 #include <netinet/tcp.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <arpa/inet.h>
+#include <netinet/ip.h>
 
 #include "http.h"
 #include "debug.h"
 #include "rand.h"
 #include "exploit.h"
+#include "ahttp.h"
 
 static int http_tcpclient_create(const char *host, int port)
 {
@@ -73,58 +72,6 @@ static int http_tcpclient_create(const char *host, int port)
         printf("Set socket method 2 failed\n");
         return -1;
     }
-
-    /*
-    int alive = 1;
-    ret = setsockopt(socket_fd, SOL_SOCKET, SO_KEEPALIVE, &alive, sizeof(alive));
-    if (ret != 0)
-    {
-        printf("Set socket method 3 failed\n");
-        return -1;
-    }
-
-    // 1秒钟无数据，触发保活机制，发送保活包s
-    int idle = 1;
-    if (setsockopt(socket_fd, SOL_TCP, TCP_KEEPIDLE, &idle, sizeof idle) != 0)
-    {
-        printf("Set socket method 4 failed\n");
-        return -1;
-    }
-
-    // 如果没有收到回应，则1秒钟后重发保活包
-    int intv = 1;
-    if (setsockopt(socket_fd, SOL_TCP, TCP_KEEPINTVL, &intv, sizeof intv) != 0)
-    {
-        printf("Set socket method 5 failed\n");
-        return -1;
-    }
-
-    // 连续1次没收到保活包，视为连接失效
-    int cnt = 1;
-    if (setsockopt(socket_fd, SOL_TCP, TCP_KEEPCNT, &cnt, sizeof cnt) != 0)
-    {
-        printf("Set socket method 6 failed\n");
-        return -1;
-    }
-    */
-    // timeout setting 1.0s
-    /*
-    timeout.tv_sec = 1;
-    timeout.tv_usec = 0;
-    
-    ret = setsockopt(socket_fd, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout));
-    if (ret != 0)
-    {
-        printf("Set timeout in send method failed\n");
-        return -1;
-    }
-    ret = setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout));
-    if (ret != 0)
-    {
-        printf("Set timeout in recv metod failed\n");
-        return -1;
-    }
-    */
 
     if (connect(socket_fd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1)
     {
@@ -341,25 +288,6 @@ int http_parse_result(const char *lpbuf, char *rebuf)
     return 0;
 }
 
-int http_judge(const char *inbuf, int debug_mode)
-{
-    /*
-     * If we have the wrrong password or username
-     * This fucntion will return 1
-     * If we have the right password or username
-     * This function will return 0
-     */
-
-    char *ptmp = NULL;
-    ptmp = (char *)strstr(inbuf, "?flag=0");
-    if (!ptmp)
-    {
-        return 0;
-    }
-
-    return 1;
-}
-
 //char *http_post(const char *url, const char *post_str, int debug_mode, int not_recv)
 void http_post(const struct HTTP_POST_ARG *input)
 {
@@ -367,34 +295,33 @@ void http_post(const struct HTTP_POST_ARG *input)
     char *url = input->URL;
     char *post_str = input->PostData;
     int debug_mode = input->DebugMode;
-    int not_recv = input->NotRecv;
+    int attack = input->Attack;
 
     int socket_fd = -1;
     int port = 0;
-    int i;
+    //int i;
     char *lpbuf = calloc((MY_RAND_MAX_PASSWORD_LENGTH + MY_RAND_MAX_USERNAME_LENGTH + 100), sizeof(char));
     char host_addr[BUFFER_SIZE] = {'\0'};
     char file[BUFFER_SIZE] = {'\0'};
     char *response_data = NULL;
-    char pdebug[BUFFER_SIZE] = {'\0'};
     char return_string[BUFFER_SIZE] = "lalalafornullvaluereturn?flag=0";
     char *return_str = input->ReturnStr;
 
     if (!url || !post_str)
     {
-        printf("url or post_str is null, failed..\n");
+        debug(debug_mode, 1, "url or post_str is null, failed...");
         return_str = return_string;
     }
     if (http_parse_url(url, host_addr, file, &port))
     {
-        printf("http_parse_url failed..\n");
+        debug(debug_mode, 1, "http_parse_url failed...");
         return_str = return_string;
     }
     //printf("host_addr : %s\nfile:%s\n%d\n", host_addr, file, port);
     socket_fd = http_tcpclient_create(host_addr, port);
     if (socket_fd < 0)
     {
-        printf("http_tcpclient_create failed..\n");
+        debug(debug_mode, 1, "http_tcpclient_create failed...");
         return_str = return_string;
     }
 
@@ -403,68 +330,69 @@ void http_post(const struct HTTP_POST_ARG *input)
 
     // It's time to recv from server
     // Store the data from server in 'lpbuf'
-    //sprintf(pdebug, "not_recv option is: %d", not_recv);
-    //debug(debug_mode, pdebug);
-
     // This will not wait and recv the data from server
-    if (not_recv == 1)
+    if (attack == 1)
     {
-        //debug(debug_mode, "Not recv the data from server");
-        for (i = 1; i < MAX_SEND_TIME; i++)
+        debug(debug_mode, 2, "ATTACK!!!!--------------");
+        struct AHTTP_INPUT *atmp = (struct AHTTP_INPUT *)malloc(sizeof(struct AHTTP_INPUT));
+        atmp->IP = host_addr;
+        atmp->Port = port;
+        if (debug_mode == 2)
         {
-            //debug(debug_mode, pdebug);
-            if (http_tcpclient_send(socket_fd, lpbuf, strlen(lpbuf)) < 0)
-            {
-                printf("http_tcpclient_send failed..\n");
-                //memset(pdebug, '\0', sizeof(pdebug));
-                sprintf(pdebug, "Send the %d time", i);
-                debug(debug_mode, pdebug);
-                //http_tcpclient_close(socket_fd);
-                //return return_string;
-                break;
-            }
+            atmp->MaxLoop = 10;
         }
+        else
+        {
+            atmp->MaxLoop = -1;
+        }
+        debug(debug_mode, 2, "Start sending data...");
+        dosattack(atmp);
+        free(atmp);
     }
 
     // This will wait and recv data and return
-    else if (not_recv != 1)
+    else if (attack != 1)
     {
         sprintf(lpbuf, HTTP_POST, file, host_addr, port, strlen(post_str), post_str);
         // send now
+        debug(debug_mode, 1, "Start sending data...");
         if (http_tcpclient_send(socket_fd, lpbuf, strlen(lpbuf)) < 0)
         {
-            printf("http_tcpclient_send failed..\n");
+            debug(debug_mode, 1, "http_tcpclient_send failed..");
             //http_tcpclient_close(socket_fd);
             //return return_string;
         }
 
         if (http_tcpclient_recv(socket_fd, return_string) <= 0)
         {
-            printf("http_tcpclient_recv failed..\n");
+            debug(debug_mode, 1, "http_tcpclient_recv failed...");
             //http_tcpclient_close(socket_fd);
             //return return_string;
         }
-        debug(debug_mode, "Recv the data from server");
+        debug(debug_mode, 1, "Recvevicing the data from server...");
 
         response_data = (char *)calloc(MY_HTTP_DEFAULT_RESPONSE_LENGTH, sizeof(char));
         if (!response_data)
         {
-            printf("Response malloc failed\n");
+            debug(debug_mode, 1, "Response malloc failed\n");
             //return return_string;
         }
 
         // Return value is '0' mean success
         if (http_parse_result(return_string, response_data) != 0)
         {
-            printf("http_parse_result failed\n");
+            debug(debug_mode, 1, "http_parse_result failed\n");
             //return return_string;
         }
+        debug(debug_mode, 2, "Start copying the data to buf");
         strcpy(return_str, response_data);
+        debug(debug_mode, 2, "End the copy");
         //return response_data;
         //http_tcpclient_close(socket_fd);
     }
     http_tcpclient_close(socket_fd);
     free(lpbuf);
+    debug(debug_mode, 2, "End in the http_post");
 }
 
 /*

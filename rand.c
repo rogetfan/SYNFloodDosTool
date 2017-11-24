@@ -25,6 +25,96 @@
 #define MY_RAND_MAX_PASSWORD_LENGTH 12
 #endif
 
+char *grand_user(struct GINPUT *pinput)
+{
+    /*
+     * Generate the random user name and return
+     */
+
+    struct GINPUT *ptmp = (struct GINPUT *)malloc(sizeof(struct GINPUT));
+    ptmp = pinput;
+    char *lstring;
+    int rand_number_0 = -1;
+    int rand_number_1 = -1;
+    float MAX = ptmp->Max;
+    float re_seed = 0;
+
+    lstring = (char *)calloc((MAX + 1), sizeof(char));
+    rand_number_0 = 1 + (int)(rand() % ((int)MAX - 1));
+
+    re_seed = ptmp->Seed;
+    if (re_seed > 1024)
+    {
+        re_seed = 0;
+    }
+    // srand is here
+    srand((int)time(0) + re_seed);
+
+    float i;
+    for (i = 0; i < rand_number_0; i++)
+    {
+        // [a, b] random interger
+        // [33, 126] except space[32]
+        // 92 = 126 - 33 - 1
+        rand_number_1 = 33 + (int)(rand() % 92);
+        if (isprint(rand_number_1))
+        {
+            //printf("%d\n", rand_number);
+            //printf("%c\n", rand_number);
+            sprintf(lstring, CAT_STRING, lstring, rand_number_1);
+            //printf("%s\n", lstring);
+        }
+    }
+    //printf("%s\n", lstring);
+    free(ptmp);
+    return lstring;
+}
+
+char *grand_passwd(struct GINPUT *pinput)
+{
+    /*
+     * Generate the random password and return
+     */
+
+    struct GINPUT *ptmp = (struct GINPUT *)malloc(sizeof(struct GINPUT));
+    ptmp = pinput;
+    char *lstring;
+    int rand_number_0 = -1;
+    int rand_number_1 = -1;
+    float MAX = ptmp->Max;
+    float re_seed = 0;
+
+    lstring = (char *)calloc((MAX + 1), sizeof(char));
+    rand_number_0 = 1 + (int)(rand() % ((int)MAX - 1));
+
+    re_seed = ptmp->Seed;
+    if (re_seed > 1024)
+    {
+        re_seed = 0;
+    }
+    // srand is here
+    srand((int)time(0) + re_seed);
+
+    float i;
+    for (i = 0; i < rand_number_0; i++)
+    {
+        // [a, b] random interger
+        // [33, 126] except space[32]
+        // 92 = 126 - 33 - 1
+        rand_number_1 = 33 + (int)(rand() % 92);
+        if (isprint(rand_number_1))
+        {
+            //printf("%d\n", rand_number);
+            //printf("%c\n", rand_number);
+            sprintf(lstring, CAT_STRING, lstring, rand_number_1);
+            //printf("%s\n", lstring);
+        }
+    }
+    //printf("%s\n", lstring);
+    free(ptmp);
+    return lstring;
+}
+
 void rand_string(char *rebuf, const struct RAND_INPUT *input)
 {
     /* NOTE:
@@ -34,58 +124,30 @@ void rand_string(char *rebuf, const struct RAND_INPUT *input)
      * DebugMode    Show more infomation
      */
 
-    int rand_number_0 = -1;
-    int rand_number_1 = -1;
     int MAX;
-    int re_seed = 0;
-    char *lstring;
-    //char dtmp[BUFFER_SIZE] = {'\0'};
+    char *strtmp = NULL;
 
     struct RAND_INPUT *ptmp = (struct RAND_INPUT *)input;
+    struct GINPUT *sinput = (struct GINPUT *)malloc(sizeof(struct GINPUT));
 
-    if (ptmp->Flag == 0)
+    if (ptmp->RandFlag == 0)
     {
         MAX = (int)MY_RAND_MAX_USERNAME_LENGTH;
+        strtmp = (char *)calloc((MAX + 1), sizeof(char));
+        sinput->Seed = (float)ptmp->NumLoop + ptmp->Seed;
+        sinput->Max = (float)MAX;
+        strtmp = grand_passwd(sinput);
     }
-    else if(ptmp->Flag == 1)
+    else if (ptmp->RandFlag == 1)
     {
-        //printf("%d\n", (int)MY_RAND_MAX_PASSWORD_LENGTH);
         MAX = (int)MY_RAND_MAX_PASSWORD_LENGTH;
+        strtmp = (char *)calloc((MAX + 1), sizeof(char));
+        sinput->Seed = (float)ptmp->NumLoop + ptmp->Seed;
+        sinput->Max = (float)MAX;
+        strtmp = grand_passwd(sinput);
     }
-    lstring = (char *)calloc((MAX + 1), sizeof(char));
-    rand_number_0 = 1 + (int)(rand() % (MAX - 1));
-
-    re_seed = ptmp->NumLoop + ptmp->Seed;
-    if (re_seed > BUFFER_SIZE)
-    {
-        re_seed = 0;
-    }
-    // seand is here
-    srand((int)time(0) + re_seed);
-
-    //printf("%d\n", MAX);
-    int i;
-    for (i = 0; i < rand_number_0; i++)
-    {
-        // [a, b] random interger
-        // [33, 126] except space[32]
-        // 92 = 126 - 33 - 1
-        rand_number_1 = 33 + (int)(rand() % 92);
-        //printf("62\n");
-        //printf("%d\n", rand_number);
-        if (isprint(rand_number_1))
-        {
-            //printf("%d\n", rand_number);
-            //printf("%c\n", rand_number);
-            sprintf(lstring, CAT_STRING, lstring, rand_number_1);
-            //printf("%s\n", lstring);
-        }
-    }
-    //sprintf(dtmp, "Password: %s", lstring);
-    //debug(ptmp->DebugMode, dtmp);
-    //printf("%s\n", lstring);
-    strcpy(rebuf, lstring);
-    //printf("%s\n", rebuf);
+    //free(sinput);
+    strcpy(rebuf, strtmp);
 }
 
 /*
@@ -119,7 +181,7 @@ int main(int argc, char *argv[])
         ++control_seed;
 
         testinput->DebugMode = 1;
-        testinput->Flag = 1;
+        testinput->RandFlag = 1;
         testinput->NumLoop = num_loop;
         testinput->Seed = control_seed;
 
