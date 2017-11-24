@@ -177,6 +177,18 @@ int main(int argc, char *argv[])
     }
 
     // Init struct
+    if (rand_flag < 0)
+    {
+        rand_flag = 0;
+    }
+    if (debug_mode < 0)
+    {
+        debug_mode = 0;
+    }
+    if (attack < 0)
+    {
+        attack = 0;
+    }
     pinput->RandFlag = rand_flag;
     pinput->DebugMode = debug_mode;
     pinput->Attack = attack;
