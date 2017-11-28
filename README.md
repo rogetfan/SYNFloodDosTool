@@ -12,6 +12,18 @@
 
 于是这里采用了`SYN Flood`攻击的方式，放弃接收三次握手的第二阶段的握手包，或者接收了不发送第三个确认包
 
+最高接近`8M/s`
+
+<2017/11/28>
+
+攻击时候加入了随机ip和随机端口的设置
+
+还有自动间断攻击的方法
+
+编辑`crontab -e`加入间隔启动代码
+
+结束程序执行脚本在`script`里面
+
 # Complie
 
 Into the Dictoary and excute the `make` command
