@@ -25,5 +25,7 @@ struct GINPUT
 };
 
 void rand_string(char *rebuf, const struct RAND_INPUT *input);
+void rand_ip(char *rebuf);
+int rand_port(void);
 
 #endif

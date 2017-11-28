@@ -16,6 +16,8 @@
 #include "exploit.h"
 
 #define CAT_STRING "%s%c"
+#define CAT_NUM "%d%c"
+#define IP_STRING "%s.%d"
 
 #ifndef MY_RAND_MAX_USERNAME_LENGTH
 #define MY_RAND_MAX_USERNAME_LENGTH 12
@@ -40,6 +42,7 @@ char *grand_user(struct GINPUT *pinput)
     float re_seed = 0;
 
     lstring = (char *)calloc((MAX + 1), sizeof(char));
+    memset(lstring, '\0', strlen(lstring));
     rand_number_0 = 1 + (int)(rand() % ((int)MAX - 1));
 
     re_seed = ptmp->Seed;
@@ -50,7 +53,7 @@ char *grand_user(struct GINPUT *pinput)
     // srand is here
     srand((int)time(0) + re_seed);
 
-    float i;
+    int i;
     for (i = 0; i < rand_number_0; i++)
     {
         // [a, b] random interger
@@ -85,6 +88,7 @@ char *grand_passwd(struct GINPUT *pinput)
     float re_seed = 0;
 
     lstring = (char *)calloc((MAX + 1), sizeof(char));
+    memset(lstring, '\0', strlen(lstring));
     rand_number_0 = 1 + (int)(rand() % ((int)MAX - 1));
 
     re_seed = ptmp->Seed;
@@ -95,7 +99,7 @@ char *grand_passwd(struct GINPUT *pinput)
     // srand is here
     srand((int)time(0) + re_seed);
 
-    float i;
+    int i;
     for (i = 0; i < rand_number_0; i++)
     {
         // [a, b] random interger
@@ -150,6 +154,71 @@ void rand_string(char *rebuf, const struct RAND_INPUT *input)
     strcpy(rebuf, strtmp);
 }
 
+int rand_num(int seed)
+{
+    /*
+     * Return the random number between 1-255
+     */
+
+    int rand_number = -1;
+    int return_num = -1;
+
+    // srand is here
+    srand((int)time(0) + seed);
+
+    // [a, b] random interger
+    // [1, 254] except space[32]
+    // 252 = 254 - 1 - 1
+    rand_number = 1 + (int)(rand() % 252);
+    return_num = rand_number;
+    return return_num;
+}
+
+void rand_ip(char *rebuf)
+{
+    /*
+     * Return the random ip address
+     */
+
+    int i;
+    int ip_part = 0;
+    char *ip_string;
+
+    ip_string = (char *)calloc(20, sizeof(char));
+    memset(ip_string, '\0', strlen(ip_string));
+
+    for (i = 0; i < 4; ++i)
+    {
+        // ip has four num like 192 168 1 1
+        ip_part = rand_num(i);
+        sprintf(ip_string, IP_STRING, ip_string, ip_part);
+    }
+
+    // delete the first '.'
+    ip_string = ip_string + 1;
+    strcpy(rebuf, ip_string);
+}
+
+int rand_port(void)
+{
+    /*
+     * Return randome port
+     */
+
+    int rand_number = -1;
+    int return_num = -1;
+
+    // srand is here
+    srand((int)time(0));
+
+    // [a, b] random interger
+    // [1, 9999] except space[32]
+    // 9997 = 9999 - 1 - 1
+    rand_number = 1 + (int)(rand() % 9997);
+    return_num = rand_number;
+    return return_num;
+}
+
 /*
 int main(int argc, char *argv[])
 {
@@ -159,8 +228,7 @@ int main(int argc, char *argv[])
     int num_loop = 0;
     int control_seed = 0;
     int seed = 0;
-    struct RAND_INPUT *testinput = (struct RAND_INPUT *)malloc(sizeof(struct RAND_INPUT));
-    ;
+    //struct RAND_INPUT *testinput = (struct RAND_INPUT *)malloc(sizeof(struct RAND_INPUT));
     test_buf = (char *)calloc(MY_RAND_MAX_PASSWORD_LENGTH, sizeof(char));
     for (;;)
     {
@@ -173,29 +241,31 @@ int main(int argc, char *argv[])
         {
             seed = 0;
         }
-        if (control_seed == 4)
-        {
-            ++seed;
-            control_seed = 0;
-        }
-        ++control_seed;
+        ++seed;
+        //if (control_seed == 4)
+        //{
+        //    ++seed;
+        //    control_seed = 0;
+        //}
+        //++control_seed;
 
-        testinput->DebugMode = 1;
-        testinput->RandFlag = 1;
-        testinput->NumLoop = num_loop;
-        testinput->Seed = control_seed;
+        //testinput->DebugMode = 1;
+        //testinput->RandFlag = 1;
+        //testinput->NumLoop = num_loop;
+        //testinput->Seed = control_seed;
 
-        rand_string(test_buf, testinput);
+        //rand_string(test_buf, testinput);
+        rand_ip(test_buf);
         printf("%s\n", test_buf);
-        ++num_loop;
-        if (num_loop >= 1024)
-        {
-            num_loop = 0;
-        }
+        //++num_loop;
+        //if (num_loop >= 1024)
+        //{
+        //    num_loop = 0;
+        //}
         //sleep(1);
     }
     free(test_buf);
-    free(testinput);
+    //free(testinput);
     return 0;
 }
 */

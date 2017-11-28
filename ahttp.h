@@ -11,8 +11,10 @@ struct AHTTP_INPUT
 {
     int MaxLoop;
     int DebugMode;
-    char *IP;
-    int Port;
+    char *SrcIP;
+    char *DstIP;
+    int SrcPort;
+    int DstPort;
 };
 
 void dosattack(const struct AHTTP_INPUT *ainput);
