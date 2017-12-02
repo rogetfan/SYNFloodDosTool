@@ -8,10 +8,12 @@ EXEC = tool
 
 start: $(OBJS)
 		$(CC) -o $(EXEC) $(OBJS) -g -Wall -lpthread
-		@echo '--- Complie ALL File Ok ---'
+		@echo '--- Complie All File Ok ---'
 
 .c.o:
 		$(CC) -o $@ -c $< -g -Wall -lpthread
 
 clean:
 		rm -f $(OBJS)
+		rm -f $(EXEC)
+		@echo '--- Clean All File Ok ---'
